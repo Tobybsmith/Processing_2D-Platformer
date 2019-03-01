@@ -1,4 +1,6 @@
-boolean down, left, right, space;
+boolean down, left, right, space; //Movement Keys
+
+//Player Stats, maybe move to object at someoe point
 float playerXPos;
 float playerYPos;
 float playerXSpeed = 5;
@@ -6,30 +8,35 @@ float playerYSpeed;
 float playerJumpSpeed = -20;
 float playerSize = 50;
 
+//Angle for sin() to move up and down (cannon)
 float angle = 0;
 
+//Player Sprite Image
 PImage jamieson; 
 
+//Dirt and grass of the first three levels
 color grassColour = #1b5e20;
 color dirtColour = #733508;
 
-int difficulty = 0;
-
+//Which level/cutscene
 int mode = -1;
 
+//Physics constants
 float gravity = 1;
 float friction = 1;
 
+//To progress from Lore menu to start menu
 boolean click = false;
 
-int cols = 0;
-
+//Collision testing with flag cols (end)
 boolean collision = false;
 boolean collisionEnd = false;
-boolean Win = false;
 
+//Win and loss scenarios
+boolean Win = false;
 boolean death = false;
 
+//Delcaring boxes, see Box object
 Box a = new Box();
 Box b = new Box();
 Box c = new Box();
@@ -40,16 +47,20 @@ Box rand = new Box();
 Box wallR = new Box();
 Box wallL = new Box();
 
+//Declaring the Cannon object
 Cannon cannon = new Cannon();
 
+//Declaring the Bullet object
 Bullet bul = new Bullet();
 Bullet shot1 = new Bullet();
 Bullet shot2 = new Bullet();
 
+//Declaring the Flag object
 Flag f = new Flag();
 
 void setup()
 {
+  //Start with all controls as False
   left = false;
   right = false;
   space = false;
@@ -57,13 +68,14 @@ void setup()
 
   size(1100, 900);
 
+  //Loading the player sprite
   jamieson = loadImage("rossJamieson.jpg");
 
-  //Player
+  //Player placement
   playerXPos = 100;
   playerYPos = height - playerSize;
 
-  //Platform "a"
+  //Platform "a" initialization (changes every level)
   a.boxXPos = 200;
   a.boxYPos = 800;
   a.boxXSize = 100;
@@ -75,7 +87,7 @@ void setup()
   a.grassYSize = a.boxYSize/5;
   a.grasscolour = grassColour;
 
-  //Platform "b"
+  //Platform "b" initialization (changes every level)
   b.boxXPos = 400;
   b.boxYPos = 600;
   b.boxXSize = 100;
@@ -87,7 +99,7 @@ void setup()
   b.grassYSize = b.boxYSize/5;
   b.grasscolour = grassColour;
 
-  //Platform "c"
+  //Platform "c" initialization (changes every level)
   c.boxXPos = 600;
   c.boxYPos = 400;
   c.boxXSize = 100;
@@ -99,7 +111,7 @@ void setup()
   c.grassYSize = c.boxYSize/5;
   c.grasscolour = grassColour;
 
-  //Platform "d"
+  //Platform "d" initialization (changes every level)
   d.boxXPos = 800;
   d.boxYPos = 200;
   d.boxXSize = 100;
@@ -111,7 +123,7 @@ void setup()
   d.grassYSize = d.boxYSize/5;
   d.grasscolour = grassColour;
 
-  //Platform "e"
+  //Platform "e" initialization (changes every level)
   e.boxXPos = 1000;
   e.boxYPos = 100;
   e.boxXSize = 100;
@@ -123,25 +135,25 @@ void setup()
   e.grassYSize = e.boxYSize/5;
   e.grasscolour = grassColour;
 
-  //Platform "ground"
+  //Ground initialization
   ground.boxXPos = 0;
   ground.boxYPos = height - 5;
   ground.boxXSize = width;
   ground.boxYSize = 10;
   ground.boxcolour = a.grasscolour;
 
-  //Right Wall
+  //Right Wall Initialization
   wallR.boxXPos = width;
   wallR.boxYPos = 0;
   wallR.boxXSize = 50;
   wallR.boxYSize = height;
-  //Left Wall
+  //Left Wall Initilaization
   wallL.boxXPos = 0;
   wallL.boxYPos = 0;
   wallL.boxXSize = -50;
   wallL.boxYSize = height;
 
-  //Random Position and Sized Box
+  //Random Position and Sized Box (for test cases)
   rand.boxXPos = random(width);
   rand.boxYPos = random(height); 
   rand.boxXSize = random(200);
@@ -150,7 +162,7 @@ void setup()
 
 
 
-  //Flag "f" (Ends Level);
+  //Flag "f" Initialization (Ends Level);
   f.poleX = width - 6;
   f.poleY = 50;
   f.poleLength = 5;
@@ -209,6 +221,7 @@ void draw()
 
   background(25);
   noStroke();
+  //Gravity and snapping to the floor acting on the player
   playerYPos = playerYPos + playerYSpeed;
   playerYSpeed = playerYSpeed + gravity;
   if (playerYPos + playerSize > height)
@@ -229,13 +242,9 @@ void draw()
   {
     playerYPos = playerYPos + playerJumpSpeed;
   }
-  if (key == 'k')
-  {
-    death = true;
-  }
-
   if (mode == -3)
   { //DEATH TEXT-----------------------------------------------------------------------------------------------------------------
+    //Occurs when the player dies
     background(0);
     fill(#2874a6);
     textSize(50);
@@ -247,12 +256,13 @@ void draw()
     {
       mode = -2;
     }
-    if(keyPressed && key == 's')
+    if (keyPressed && key == 's')
     {
       exit();
     }
   } else if (mode == -1) 
   {//INTRO LORE-----------------------------------------------------------------------------------------------------------------------
+    //Starts the game with a little story
     textSize(30);
     fill(255);
     text("Oh no, Mr. Jamieson has left processing open all night", 100, 200);
@@ -265,6 +275,7 @@ void draw()
     }
   } else if (mode == -2)
   {//START MENU---------------------------------------------------------------------------------------------------------------------
+    //Nameof game and creator
     background(0);
     fill(#2874a6);
     textSize(30);
@@ -279,88 +290,62 @@ void draw()
   }
   if (mode == 0)
   {//LEVEL 1----------------------------------------------------------------------------------------------------------------------------------
+    //The first level
     if (click == true)
     {
       background(#3498db);
-      //Flag "F"
+      //Flag "F" Position and drawing
       fill(f.flagColour);
       rect(f.poleX, f.poleY, f.poleLength, f.poleHeight);
       triangle(f.triX1, f.triY1, f.triX2, f.triY2, f.triX3, f.triY3);
 
 
-      //Platform "a"
+      //Platform "a" Position and drawing
       fill(a.boxcolour);
       rect(a.boxXPos, a.boxYPos, a.boxXSize, a.boxYSize);
       fill(a.grasscolour);
       rect(a.grassXPos, a.grassYPos, a.grassXSize, a.grassYSize);
 
-      //Platform "b"
+      //Platform "b" position and drawing
       fill(b.boxcolour);
       rect(b.boxXPos, b.boxYPos, b.boxXSize, b.boxYSize);
       fill(b.grasscolour);
       rect(b.grassXPos, b.grassYPos, b.grassXSize, b.grassYSize);
 
-      //Platform "c"
+      //Platform "c" position and drawing
       fill(c.boxcolour);
       rect(c.boxXPos, c.boxYPos, c.boxXSize, c.boxYSize);
       fill(c.grasscolour);
       rect(c.grassXPos, c.grassYPos, c.grassXSize, c.grassYSize);
 
 
-      //Platform "d"
+      //Platform "d" position and drawing
       fill(d.boxcolour);
       rect(d.boxXPos, d.boxYPos, d.boxXSize, d.boxYSize);
       fill(d.grasscolour);
       rect(d.grassXPos, d.grassYPos, d.grassXSize, d.grassYSize);
 
 
-      //Platform "e"
+      //Platform "e" position and drawing
       fill(e.boxcolour);
       rect(e.boxXPos, e.boxYPos, e.boxXSize, e.boxYSize);
       fill(e.grasscolour);
       rect(e.grassXPos, e.grassYPos, e.grassXSize, e.grassYSize);
 
 
-      //Platform "ground"
+      //Ground creation
       fill(ground.boxcolour);
       rect(ground.boxXPos, ground.boxYPos, ground.boxXSize, ground.boxYSize);
 
-      //Platform "wallR"
+      //Right Wall Drawing
       rect(wallR.boxXPos, wallR.boxYPos, wallR.boxXSize, wallR.boxYSize);
 
-      //Platform "wallL"
+      //Left Wall drawing
       rect(wallL.boxXPos, wallL.boxYPos, wallL.boxXSize, wallL.boxYSize);
 
-      /*//Bullet "bul"
-       fill(bul.bulletcolour);
-       rect(bul.bulletXPos, bul.bulletYPos, bul.bulletXSize, bul.bulletYSize);
-       bul.bulletXPos = bul.bulletXPos + bul.bulletXSpeed;
-       bul.bulletYPos = bul.bulletYPos + bul.bulletYSpeed;
-       bul.bulletYSpeed = bul.bulletYSpeed + gravity/1000;
-       */
 
-
-      /*collisionBoxBul();
-       if (death == true)
-       {
-       mode = -2;
-       }
-       */
-
-
-
-      collisionBoxB();//B
-      if (collision == true)
-      {
-        playerYPos = b.boxYPos - b.boxYSize;
-        playerYSpeed = 0;
-        gravity = 0;
-      } else
-      {
-        gravity = 1;
-      }
-
-      collisionBoxA();//A
+      //The collision detection for each Box and wall
+      collisionBoxA();
       if (collision == true)
       {
         playerYPos = a.boxYPos - playerSize;
@@ -371,7 +356,17 @@ void draw()
         gravity = 1;
       }
 
-      collisionBoxC();//C
+      collisionBoxB();
+      if (collision == true)
+      {
+        playerYPos = b.boxYPos - b.boxYSize;
+        playerYSpeed = 0;
+        gravity = 0;
+      } else
+      {
+        gravity = 1;
+      }
+      collisionBoxC();
       if (collision == true)
       {
         playerYPos = c.boxYPos - c.boxYSize;
@@ -383,7 +378,7 @@ void draw()
       }
 
 
-      collisionBoxD();//D
+      collisionBoxD();
       if (collision == true)
       {
         playerYPos = d.boxYPos - d.boxYSize;
@@ -394,7 +389,7 @@ void draw()
         gravity = 1;
       }
 
-      collisionBoxE();//E
+      collisionBoxE();
       if (collision == true)
       {
         playerYPos = e.boxYPos - e.boxYSize;
@@ -405,7 +400,7 @@ void draw()
         gravity = 1;
       }
 
-      collisionBoxGround();//Ground
+      collisionBoxGround();
       if (collision == true)
       {
         playerYPos = ground.boxYPos - ground.boxYSize*4;
@@ -416,21 +411,21 @@ void draw()
         gravity = 1;
       }
 
-      collisionBoxWallR();//Right Wall
+      collisionBoxWallR();
       if (collision == true)
       {
         right = false;
         playerXPos = wallR.boxXPos - playerSize;
       }
 
-      collisionBoxWallL();//Right Wall
+      collisionBoxWallL();
       if (collision == true)
       {
         left = false;
         playerXPos = 0;
       }
 
-      endCollision();//end
+      endCollision();
       if (collisionEnd == true)
       {
         background(100);
@@ -439,18 +434,17 @@ void draw()
       }
 
 
-      //Player
-
+      //Player Drawing
       rect(playerXPos, playerYPos, playerSize, playerSize);
       image(jamieson, playerXPos, playerYPos, playerSize, playerSize);
     } 
-
-    //text(frameRate, 100, 100);
   } else if (mode == 1) //LEVEL 2------------------------------------------------------------------------------------------------
   {
-
-    death = false;
+    //Start with death being not on
+    death = false; 
     background(#3498db);
+    
+    //Reinitialize each object with new size and Position
     //Platform "a"
     a.boxXPos = 500;
     a.boxYPos = 400;
@@ -483,7 +477,7 @@ void draw()
     f.poleX = width - 6;
     f.poleY = 550;
 
-
+    //Re-draw every object
     //Platform "a"
     fill(a.boxcolour);
     rect(a.boxXPos, a.boxYPos, a.boxXSize, a.boxYSize);
@@ -504,35 +498,30 @@ void draw()
     fill(100);
     ellipse(cannon.bodyX, cannon.bodyY, cannon.bodyRad, cannon.bodyRad);
     rect(cannon.x1, cannon.y1, cannon.xLen, cannon.yLen);
+    
+    //This makes the cannon move up and down cyclically
     cannon.bodyY = map(sin(angle), -1, 1, cannon.bodyRad, height - cannon.bodyRad);
     cannon.y1 = map(sin(angle), -1, 1, cannon.bodyRad, height - cannon.bodyRad) - 5;
 
-    //Bullet Time with shot1
-    //Bullet "shot1"
+    //Bullet Time with shot1 and shot2 
+    //They both spawn halfway along from eachother
     fill(shot1.bulletcolour);
     rect(shot1.bulletXPos, shot1.bulletYPos, shot1.bulletXSize, shot1.bulletYSize);
-    //textSize(12);
-    //text("OLE", shot1.bulletXPos, shot1.bulletYPos);
     shot1.bulletXPos = shot1.bulletXPos + shot1.bulletXSpeed;
     shot1.bulletYPos = shot1.bulletYPos + shot1.bulletYSpeed;
     shot1.bulletYSpeed = shot1.bulletYSpeed + gravity/1000;
 
     fill(shot2.bulletcolour);
     rect(shot2.bulletXPos, shot2.bulletYPos, shot2.bulletXSize, shot2.bulletYSize);
-    //textSize(12);
-    //text("TLE", shot1.bulletXPos, shot1.bulletYPos);
     shot2.bulletXPos = shot2.bulletXPos + shot2.bulletXSpeed;
     shot2.bulletYPos = shot2.bulletYPos + shot2.bulletYSpeed;
     shot2.bulletYSpeed = shot2.bulletYSpeed + gravity/1000;
 
-    //Player
-
+    //Player drwaing
     rect(playerXPos, playerYPos, playerSize, playerSize);
     image(jamieson, playerXPos, playerYPos, playerSize, playerSize);
 
-
-
-
+    //Collision recognition for all the objects again
     collisionBoxA();
     if (collision == true)
     {
@@ -592,6 +581,8 @@ void draw()
         mode = -3;
       }
     }
+    
+    //Bullet timer
     if (shot1.bulletXPos == width/2)
     {
       //Bullet "shot2"
@@ -665,8 +656,12 @@ void keyReleased()
 }
 
 //LEVEL 1---------------------------------------------------------------------------------------------------------------------
+
+//This is the meat of the code and detects when the player is in the object 
 void collisionBoxB() //Platfrom b
 {
+  //if the player is in the object using the verticies, there is a collision
+  //this only works with a player length of 50 for some reason
   if ((playerXPos + playerSize > b.boxXPos && playerXPos < b.boxXPos + b.boxXSize) && (playerYPos + playerSize > b.boxYPos && playerYPos < b.boxYPos + playerSize))
   {
     collision = true;
