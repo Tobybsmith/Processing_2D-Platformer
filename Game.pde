@@ -8,7 +8,7 @@ float playerYSpeed;
 float playerJumpSpeed = -20;
 float playerSize = 50;
 
-//Angle for sin() to move up and down (cannon)
+//Angle for sin() to move up and down (cannon) or left and right (enemy1)
 float angle = 0;
 
 //Player Sprite Image
@@ -327,7 +327,7 @@ void draw()
       rect(a.grassXPos, a.grassYPos, a.grassXSize, a.grassYSize);
 
       //Platform "b" position and drawing
-      fill(b.boxcolour);
+      fill(0);
       rect(b.boxXPos, b.boxYPos, b.boxXSize, b.boxYSize);
       fill(b.grasscolour);
       rect(b.grassXPos, b.grassYPos, b.grassXSize, b.grassYSize);
@@ -477,6 +477,10 @@ void draw()
       //Player Drawing
       rect(playerXPos, playerYPos, playerSize, playerSize);
       image(jamieson, playerXPos, playerYPos, playerSize, playerSize);
+      
+      //FPS
+      text(int(frameRate), 100, 100);
+      frameRate(61);
     }
   } else if (mode == 1) //LEVEL 2------------------------------------------------------------------------------------------------
   {
@@ -704,7 +708,14 @@ void collisionBoxB() //Platfrom b
   //this only works with a player length of 50 for some reason
   if ((playerXPos + playerSize > b.boxXPos && playerXPos < b.boxXPos + b.boxXSize) && (playerYPos + playerSize > b.boxYPos && playerYPos < b.boxYPos + playerSize))
   {
-    collision = true;
+    if(playerYSpeed > 0)
+    {
+      collision = true;
+    }
+    else
+    {
+      collision = false;
+    }
   } else
   {
     collision = false;
