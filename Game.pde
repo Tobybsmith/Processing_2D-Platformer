@@ -12,7 +12,9 @@ float playerSize = 50;
 float angle = 0;
 
 //Player Sprite Image
-PImage jamieson; 
+PImage jamieson;
+
+PImage enemy1;
 
 //Dirt and grass of the first three levels
 color grassColour = #1b5e20;
@@ -22,7 +24,7 @@ color dirtColour = #733508;
 int mode = -1;
 
 //Physics constants
-float gravity = 1;
+float gravity = 0.8;
 float friction = 1;
 
 //To progress from Lore menu to start menu
@@ -36,6 +38,9 @@ boolean collisionEnd = false;
 boolean Win = false;
 boolean death = false;
 
+//Enemy death
+boolean eneDeath = false;
+
 //Delcaring boxes, see Box object
 Box a = new Box();
 Box b = new Box();
@@ -46,6 +51,9 @@ Box ground = new Box();
 Box rand = new Box();
 Box wallR = new Box();
 Box wallL = new Box();
+
+//Declare an ememy 
+Enemy ene = new Enemy();
 
 //Declaring the Cannon object
 Cannon cannon = new Cannon();
@@ -70,6 +78,8 @@ void setup()
 
   //Loading the player sprite
   jamieson = loadImage("rossJamieson.jpg");
+  
+  enemy1 = loadImage("declan.jpg");
 
   //Player placement
   playerXPos = 100;
@@ -212,6 +222,16 @@ void setup()
   cannon.y1 = cannon.bodyY - 5;
   cannon.xLen = 40;
   cannon.yLen = 10;
+
+  //Enemy "ene"
+  ene.enemyXPos = width/2;
+  ene.enemyYPos = height - 50;
+  ene.enemyXSize = 50;
+  ene.enemyYSize = 50;
+  ene.enemycolour = 0;
+
+  ene.enemyXSpeed = 5;
+  ene.enemyYSpeed = 0;
 }
 
 
@@ -266,8 +286,8 @@ void draw()
     textSize(30);
     fill(255);
     text("Oh no, Mr. Jamieson has left processing open all night", 100, 200);
-    text("and has been moved into his computer.", 100, 300);
-    text("With W, A, and Space, can you help Mr. Jamieson escape?", 100, 400);
+    text("and has been teleported into his computer.", 100, 300);
+    text("With D, A, and Space, can you help Mr. Jamieson escape?", 100, 400);
     text("Press any key to move on", 100, 500);
     if (keyPressed)
     {
@@ -342,6 +362,14 @@ void draw()
 
       //Left Wall drawing
       rect(wallL.boxXPos, wallL.boxYPos, wallL.boxXSize, wallL.boxYSize);
+
+      //Enemy drawing
+      rect(ene.enemyXPos, ene.enemyYPos, ene.enemyXSize, ene.enemyYSize);
+      image(enemy1, ene.enemyXPos, ene.enemyYPos, ene.enemyXSize, ene.enemyYSize);
+
+      ene.enemyXPos = map(sin(angle), -1, 1, ene.enemyXSize, height - ene.enemyYSize);
+      //ene.enemyYPos = map(sin(angle), -1, 1, ene.enemyXSize, height - ene.enemyYSize);
+      angle = angle + 0.01;
 
 
       //The collision detection for each Box and wall
@@ -433,17 +461,29 @@ void draw()
         mode = 1;
       }
 
+      if (eneDeath == false)
+      {
+        collisionEnemy();
+        if (death == true)
+        {
+          mode = -3;
+        }
+      }
+      else
+      {
+        ene.enemyYPos = 2*height;
+      }
 
       //Player Drawing
       rect(playerXPos, playerYPos, playerSize, playerSize);
       image(jamieson, playerXPos, playerYPos, playerSize, playerSize);
-    } 
+    }
   } else if (mode == 1) //LEVEL 2------------------------------------------------------------------------------------------------
   {
     //Start with death being not on
     death = false; 
     background(#3498db);
-    
+
     //Reinitialize each object with new size and Position
     //Platform "a"
     a.boxXPos = 500;
@@ -498,7 +538,7 @@ void draw()
     fill(100);
     ellipse(cannon.bodyX, cannon.bodyY, cannon.bodyRad, cannon.bodyRad);
     rect(cannon.x1, cannon.y1, cannon.xLen, cannon.yLen);
-    
+
     //This makes the cannon move up and down cyclically
     cannon.bodyY = map(sin(angle), -1, 1, cannon.bodyRad, height - cannon.bodyRad);
     cannon.y1 = map(sin(angle), -1, 1, cannon.bodyRad, height - cannon.bodyRad) - 5;
@@ -581,7 +621,7 @@ void draw()
         mode = -3;
       }
     }
-    
+
     //Bullet timer
     if (shot1.bulletXPos == width/2)
     {
@@ -786,6 +826,25 @@ void collisionBoxShot2() //Death and Taxes
   if ((playerXPos + playerSize > shot2.bulletXPos && playerXPos < shot2.bulletXPos + shot2.bulletXSize) && (playerYPos + playerSize > shot2.bulletYPos && playerYPos < shot2.bulletYPos + shot2.bulletYSize)) //Lmao idk
   {
     death = true;
+  } else
+  {
+    death = false;
+  }
+}
+
+void collisionEnemy() //Death and Taxes
+{
+  if ((playerXPos + playerSize > ene.enemyXPos && playerXPos < ene.enemyXPos + ene.enemyXSize) && (playerYPos + playerSize > ene.enemyYPos && playerYPos < ene.enemyYPos + ene.enemyYSize)) //Lmao idk
+  {
+    if (playerYSpeed > 0)
+    {
+      death = false;
+      ene.enemycolour = #3498db;
+      eneDeath = true;
+    } else 
+    {
+      death = true;
+    }
   } else
   {
     death = false;
